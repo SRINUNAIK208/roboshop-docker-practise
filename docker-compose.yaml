@@ -4,10 +4,10 @@ networks:
    name: roboshop
 services:
  mongodb:
-   image: joindevops/mongodb
+   image: joindevops/mongodb:v1
    container_name: mongodb
  catalogue:
-   image: joindevops/catalogue
+   image: joindevops/catalogue:v1
    container_name: catalogue
    depends_on:
     - mongodb
@@ -18,7 +18,7 @@ services:
    image: redis
    container_name: redis
  user:
-   image: joindevops/user
+   image: joindevops/user:v1
    container_name: user
    depends_on:
     - redis
@@ -27,7 +27,7 @@ services:
     - REDIS_URL=redis://redis:6379
     - MONGO_URL=mongodb://mongodb:27017/users
  cart:
-   image: joindevops/cart
+   image: joindevops/cart:v1
    container_name: cart
    depends_on:
     - redis
@@ -37,10 +37,10 @@ services:
     - CATALOGUE_HOST=catalogue
     - CATALOGUE_PORT=8080
  mysql:
-   image: joindevops/mysql
+   image: joindevops/mysql:v1
    container_name: mysql
  shipping:
-   image: joindevops/shipping
+   image: joindevops/shipping:v1
    container_name: shipping
    depends_on:
     - cart
@@ -55,7 +55,7 @@ services:
     - RABBITMQ_DEFAULT_USER=roboshop
     - RABBITMQ_DEFAULT_PASS=roboshop123
  payment:
-   image: joindevops/payment
+   image: joindevops/payment:v1
    container_name: payment
    depends_on:
     - cart
@@ -68,7 +68,7 @@ services:
     - USER_PORT=8080
     - AMQP_HOST=rabbitmq
  frontend:
-   image: joindevops/frontend
+   image: joindevops/frontend:v1
    container_name: frontend
    depends_on:
     - catalogue
