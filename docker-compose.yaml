@@ -1,0 +1,81 @@
+networks:
+ default:
+   driver: bridge
+   name: roboshop
+services:
+ mongodb:
+   image: joindevops/mongodb
+   container_name: mongodb
+ catalogue:
+   image: joindevops/catalogue
+   container_name: catalogue
+   depends_on:
+    - mongodb
+   environment:
+    - MONGO=true 
+    - MONGO_URL=mongodb://mongodb:27017/catalogue
+ redis:
+   image: redis
+   container_name: redis
+ user:
+   image: joindevops/user
+   container_name: user
+   depends_on:
+    - redis
+    - mongodb
+   environment:
+    - REDIS_URL=redis://redis:6379
+    - MONGO_URL=mongodb://mongodb:27017/users
+ cart:
+   image: joindevops/cart
+   container_name: cart
+   depends_on:
+    - redis
+    - catalogue
+   environment:
+    - REDIS_HOST=redis
+    - CATALOGUE_HOST=catalogue
+    - CATALOGUE_PORT=8080
+ mysql:
+   image: joindevops/mysql
+   container_name: mysql
+ shipping:
+   image: joindevops/shipping
+   container_name: shipping
+   depends_on:
+    - cart
+    - mysql
+   environment:
+    - CART_ENDPOINT=cart:8080
+    - DB_HOST=mysql
+ rabbitmq:
+   image: rabbitmq
+   container_name: rabbitmq
+   environment:
+    - RABBITMQ_DEFAULT_USER=roboshop
+    - RABBITMQ_DEFAULT_PASS=roboshop123
+ payment:
+   image: joindevops/payment
+   container_name: payment
+   depends_on:
+    - cart
+    - user
+    - rabbitmq
+   environment:
+    - CART_HOST=cart
+    - CART_PORT=8080
+    - USER_HOST=user
+    - USER_PORT=8080
+    - AMQP_HOST=rabbitmq
+ frontend:
+   image: joindevops/frontend
+   container_name: frontend
+   depends_on:
+    - catalogue
+    - user
+    - cart
+    - shipping
+    - payment
+    
+
+
